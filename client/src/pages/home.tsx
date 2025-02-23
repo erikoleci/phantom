@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import type { WalletStatus } from "@/lib/solana";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Bitcoin, Wallet } from "lucide-react";
 
 export default function Home() {
   const [walletStatus, setWalletStatus] = useState<WalletStatus>({
@@ -34,16 +34,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Crypto dApp
-        </h1>
+    <div className="min-h-screen bg-background p-6 relative">
+      {/* Decorative grid background */}
+      <div className="crypto-grid" />
+
+      <div className="max-w-6xl mx-auto space-y-6 relative">
+        <div className="text-center space-y-2 mb-12">
+          <h1 className="text-5xl font-bold glow-text">
+            Crypto dApp
+          </h1>
+          <p className="text-gray-400">
+            Connect your wallet and claim your tokens
+          </p>
+        </div>
 
         <div className="space-y-6">
-          <Card className="w-full max-w-md mx-auto">
+          <Card className="w-full max-w-md mx-auto crypto-card">
             <CardHeader>
-              <CardTitle>Wallet Connected</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl text-white">Connect Wallet</CardTitle>
+                <Bitcoin className="h-6 w-6 text-[#00ff87]" />
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <WalletConnection onConnect={setWalletStatus} />
@@ -51,7 +62,7 @@ export default function Home() {
               <Button
                 onClick={handleClaim}
                 disabled={!walletStatus.connected || isClaiming}
-                className="w-full"
+                className={`w-full ${!walletStatus.connected ? 'opacity-50' : 'btn-glow'}`}
                 size="lg"
               >
                 {isClaiming ? (
@@ -60,9 +71,18 @@ export default function Home() {
                     Claiming...
                   </>
                 ) : (
-                  "Claim 1000 TRON"
+                  <>
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Claim 1000 TRON
+                  </>
                 )}
               </Button>
+
+              {walletStatus.connected && (
+                <p className="text-sm text-center text-emerald-400">
+                  Connected: {walletStatus.publicKey?.slice(0, 8)}...
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
