@@ -1,5 +1,6 @@
 import { WalletConnection } from "@/components/wallet-connection";
 import { TransactionForm } from "@/components/transaction-form";
+import { TronTransactionForm } from "@/components/tron-transaction-form";
 import { TransactionHistory } from "@/components/transaction-history";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
@@ -16,7 +17,7 @@ export default function Home() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <h1 className="text-4xl font-bold text-center mb-8">
-          Solana Transaction dApp
+          Crypto Transaction dApp
         </h1>
 
         {!walletStatus.connected ? (
@@ -39,13 +40,22 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <TransactionForm
-              walletAddress={walletStatus.publicKey!}
-              onSuccess={() => {
-                // Refresh balance after transaction
-                // Implementation would go here
-              }}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TransactionForm
+                walletAddress={walletStatus.publicKey!}
+                onSuccess={() => {
+                  // Refresh balance after transaction
+                  // Implementation would go here
+                }}
+              />
+
+              <TronTransactionForm
+                walletAddress={walletStatus.publicKey!}
+                onSuccess={() => {
+                  // Handle TRON transaction success
+                }}
+              />
+            </div>
 
             <TransactionHistory walletAddress={walletStatus.publicKey!} />
           </div>

@@ -8,6 +8,7 @@ export const transactions = pgTable("transactions", {
   toAddress: text("to_address").notNull(),
   amount: numeric("amount").notNull(),
   signature: text("signature").notNull(),
+  network: text("network").notNull().default('solana'),
   timestamp: timestamp("timestamp").defaultNow().notNull()
 });
 
