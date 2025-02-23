@@ -40,37 +40,32 @@ export default function Home() {
           Crypto dApp
         </h1>
 
-        {!walletStatus.connected ? (
-          <WalletConnection onConnect={setWalletStatus} />
-        ) : (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Wallet Connected</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Address: {walletStatus.publicKey}
-                </p>
-                <Button
-                  onClick={handleClaim}
-                  disabled={isClaiming}
-                  className="w-full mt-4"
-                  size="lg"
-                >
-                  {isClaiming ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Claiming...
-                    </>
-                  ) : (
-                    "Claim 1000 TRON"
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div className="space-y-6">
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>Wallet Connected</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <WalletConnection onConnect={setWalletStatus} />
+
+              <Button
+                onClick={handleClaim}
+                disabled={!walletStatus.connected || isClaiming}
+                className="w-full"
+                size="lg"
+              >
+                {isClaiming ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Claiming...
+                  </>
+                ) : (
+                  "Claim 1000 TRON"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
