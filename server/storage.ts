@@ -19,8 +19,9 @@ export class MemStorage implements IStorage {
       ...insertTx,
       id: this.currentId++,
       timestamp: new Date(),
+      network: insertTx.network ?? "default", // ✅ SIGUROHEMI QË `network` KA VLERË
     };
-    
+
     this.transactions.push(transaction);
     return transaction;
   }
