@@ -1,10 +1,10 @@
 import { WalletConnection } from "@/components/wallet-connection";
-import { TransactionForm } from "@/components/transaction-form";
-import { TronTransactionForm } from "@/components/tron-transaction-form";
-import { TransactionHistory } from "@/components/transaction-history";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import type { WalletStatus } from "@/lib/solana";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
   const [walletStatus, setWalletStatus] = useState<WalletStatus>({
@@ -12,12 +12,32 @@ export default function Home() {
     publicKey: null,
     balance: null,
   });
+  const [isClaiming, setIsClaiming] = useState(false);
+  const { toast } = useToast();
+
+  const handleClaim = async () => {
+    setIsClaiming(true);
+    try {
+      toast({
+        title: "Tokens Claimed",
+        description: "1000 TRON tokens have been claimed successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Claim Failed",
+        description: error instanceof Error ? error.message : "Failed to claim tokens",
+        variant: "destructive",
+      });
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <h1 className="text-4xl font-bold text-center mb-8">
-          Crypto Transaction dApp
+          Crypto dApp
         </h1>
 
         {!walletStatus.connected ? (
@@ -26,38 +46,29 @@ export default function Home() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Wallet Info</CardTitle>
+                <CardTitle>Wallet Connected</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Address: {walletStatus.publicKey}
-                  </p>
-                  <p className="text-lg font-semibold">
-                    Balance: {walletStatus.balance?.toFixed(4)} SOL
-                  </p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Address: {walletStatus.publicKey}
+                </p>
+                <Button
+                  onClick={handleClaim}
+                  disabled={isClaiming}
+                  className="w-full mt-4"
+                  size="lg"
+                >
+                  {isClaiming ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Claiming...
+                    </>
+                  ) : (
+                    "Claim 1000 TRON"
+                  )}
+                </Button>
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TransactionForm
-                walletAddress={walletStatus.publicKey!}
-                onSuccess={() => {
-                  // Refresh balance after transaction
-                  // Implementation would go here
-                }}
-              />
-
-              <TronTransactionForm
-                walletAddress={walletStatus.publicKey!}
-                onSuccess={() => {
-                  // Handle TRON transaction success
-                }}
-              />
-            </div>
-
-            <TransactionHistory walletAddress={walletStatus.publicKey!} />
           </div>
         )}
       </div>
