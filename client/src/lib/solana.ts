@@ -1,4 +1,18 @@
-import { Connection, PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+// Add type definitions for Phantom wallet
+declare global {
+  interface Window {
+    solana?: {
+      isPhantom?: boolean;
+      connect: () => Promise<{ publicKey: PublicKey }>;
+      disconnect: () => Promise<void>;
+      signAndSendTransaction: (transaction: Transaction) => Promise<{ signature: string }>;
+      publicKey: PublicKey | null;
+      isConnected: boolean;
+    };
+  }
+}
 
 const SOLANA_NETWORK = "devnet";
 const connection = new Connection(`https://api.${SOLANA_NETWORK}.solana.com`);
@@ -11,13 +25,14 @@ export type WalletStatus = {
 
 export async function connectWallet(): Promise<WalletStatus> {
   if (!window.solana || !window.solana.isPhantom) {
-    throw new Error("Phantom wallet not detected");
+    window.open("https://phantom.app/", "_blank");
+    throw new Error("Please install Phantom wallet first");
   }
 
   try {
     const resp = await window.solana.connect();
     const balance = await connection.getBalance(resp.publicKey);
-    
+
     return {
       connected: true,
       publicKey: resp.publicKey.toString(),
@@ -33,7 +48,7 @@ export async function sendTransaction(
   toAddress: string,
   amount: number
 ): Promise<string> {
-  if (!window.solana.isConnected) {
+  if (!window.solana || !window.solana.isConnected || !window.solana.publicKey) {
     throw new Error("Wallet not connected");
   }
 
@@ -47,10 +62,10 @@ export async function sendTransaction(
       })
     );
 
-    const signature = await window.solana.signAndSendTransaction(transaction);
-    await connection.confirmTransaction(signature.signature);
-    
-    return signature.signature;
+    const { signature } = await window.solana.signAndSendTransaction(transaction);
+    await connection.confirmTransaction(signature);
+
+    return signature;
   } catch (error) {
     console.error("Transaction failed:", error);
     throw error;

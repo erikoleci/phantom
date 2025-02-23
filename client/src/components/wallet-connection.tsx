@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Wallet } from "lucide-react";
 import { useState } from "react";
@@ -16,6 +16,17 @@ export function WalletConnection({ onConnect }: WalletConnectionProps) {
   const handleConnect = async () => {
     setIsConnecting(true);
     try {
+      // Check if Phantom is installed
+      if (!window.solana || !window.solana.isPhantom) {
+        toast({
+          title: "Phantom Wallet Required",
+          description: "Please install Phantom wallet to continue. Redirecting to installation page...",
+          variant: "destructive",
+        });
+        window.open("https://phantom.app/", "_blank");
+        return;
+      }
+
       const status = await connectWallet();
       onConnect(status);
       toast({
@@ -35,7 +46,10 @@ export function WalletConnection({ onConnect }: WalletConnectionProps) {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardContent className="pt-6">
+      <CardHeader>
+        <CardTitle className="text-center">Connect Your Wallet</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Button
           onClick={handleConnect}
           disabled={isConnecting}
@@ -47,8 +61,19 @@ export function WalletConnection({ onConnect }: WalletConnectionProps) {
           ) : (
             <Wallet className="mr-2 h-4 w-4" />
           )}
-          Connect Phantom Wallet
+          {isConnecting ? "Connecting..." : "Connect Phantom Wallet"}
         </Button>
+        <p className="text-sm text-muted-foreground mt-4 text-center">
+          Don't have Phantom wallet?{" "}
+          <a
+            href="https://phantom.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Install it here
+          </a>
+        </p>
       </CardContent>
     </Card>
   );
